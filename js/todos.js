@@ -113,19 +113,18 @@ const renderTodos = (page = 1) => {
 		  // sıralama yapılacak tekrar o sayfada render edilecek.
 		  renderTodos(current_page);
 	});
-
-	document.querySelectorAll('.page-link').forEach((btn) => {
-		// pagination butonları içinde döndürülerek, her elemente click eklendi, tıklandığında kaçıncı sayfadaysa oraya göre render edilecek.
-		btn.addEventListener('click',() => {
-			let data_id = btn.getAttribute('data-id');
-			// kaçıncı buton olduğu attribute olarak alında.
-			current_page = Number(data_id);
-			renderTodos(current_page);
-		});
-	});
-
-
 };
+
+
+document.querySelectorAll('.page-link').forEach((btn) => {
+	// pagination butonları içinde döndürülerek, her elemente click eklendi, tıklandığında kaçıncı sayfadaysa oraya göre render edilecek.
+	btn.addEventListener('click',() => {
+		let data_id = btn.getAttribute('data-id');
+		// kaçıncı buton olduğu attribute olarak alında.
+		current_page = Number(data_id);
+		renderTodos(current_page);
+	});
+});
 
 
 
