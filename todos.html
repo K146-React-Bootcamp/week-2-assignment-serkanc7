@@ -22,7 +22,21 @@
 		<div id="navbar"></div>
 		<div class="container">
 			<h1>Yapılacaklar</h1>
-			<div id="root"></div>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+					  <th scope="col">id</th>
+					  <th scope="col" id="title-sorting">Başlık <button>↓</button></th>
+					  <th scope="col">Kullanıcı Id</th>
+					  <th scope="col">Durum</th>
+					  <th scope="col"></th>
+					</tr>
+				  </thead>
+				  <tbody id="tbody">
+
+				  </tbody>
+			</table>
+
 			<div class="modal fade" id="editModal" tabindex="1">
 				<div class="modal-dialog">
 					<div class="modal-content">
@@ -69,16 +83,11 @@
 			</div>
 			<nav aria-label="Page navigation example">
 				<ul class="pagination">
-				  <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-				  <li class="page-item"><a class="page-link" href="#" data-id="1">1</a></li>
-				  <li class="page-item"><a class="page-link" href="#" data-id="2">2</a></li>
-				  <li class="page-item"><a class="page-link" href="#" data-id="3">3</a></li>
-				  <li class="page-item"><a class="page-link" href="#" data-id="4">4</a></li>
-				  <li class="page-item"><a class="page-link" href="#" data-id="5">5</a></li>
-				  <li class="page-item"><a class="page-link" href="#" data-id="6">6</a></li>
-				  <li class="page-item"><a class="page-link" href="#" data-id="7">7</a></li>
-				  <li class="page-item"><a class="page-link" href="#" data-id="8">8</a></li>
-				  <li class="page-item"><a class="page-link" href="#">Next</a></li>
+				  <li class="page-item"><a class="page-link" data-btn="prev" href="#">Previous</a></li>
+				  <div data-nav="items" class="d-flex">
+					<li class="page-item"><a class="page-link" href="#" data-id="1">1</a></li>
+				  </div>
+				  <li class="page-item"><a class="page-link"  data-btn="next" href="#">Next</a></li>
 				</ul>
 			  </nav>
 		</div>

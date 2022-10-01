@@ -1,40 +1,24 @@
 renderHeader();
 
 const todosUrl = "https://jsonplaceholder.typicode.com/todos";
-const root = document.querySelector("#root");
+const tbodyEl = document.querySelector("#tbody");
 const editModal = document.querySelector("#editModal");
+const pagiItems = document.querySelector('[data-nav=items]');
+const nextBtn = document.querySelector('[data-btn=next]');
+const prevBtn = document.querySelector('[data-btn=prev]');
 let todos = [];
 let todo;
 
-// sayfa sayısı
-let current_page = 1;
 
-//her sayfada ne kadar satır bulunacağı
+let current_page = 1;
 let rows = 10;
 
 
 const renderTodos = (page = 1) => {
-	//page = 1 -> default olarak 1. sayfada olması için varsayılan değer.
-	root.innerHTML = "";
-	// todoları listele
-	const table = document.createElement("table");
-	table.setAttribute("class", "table table-hover");
 
-	const thead = document.createElement("thead");
+	tbodyEl.innerHTML = "";
 	
-	// sıralama yapmak için title-sorting id' si tanımlandı. Butonada verilebilir.
-	thead.innerHTML = `
-    <tr>
-      <th scope="col">id</th>
-      <th scope="col" id="title-sorting">Başlık <button>&darr;</button></th>
-      <th scope="col">Kullanıcı Id</th>
-      <th scope="col">Durum</th>
-      <th scope="col"></th>
-    </tr>
-  `;
-	table.appendChild(thead);
-
-	const tbody = document.createElement("tbody");
+	
 	const renderItem = (item) => {
 		const tr = document.createElement("tr");
 		tr.innerHTML = `
@@ -51,26 +35,24 @@ const renderTodos = (page = 1) => {
 				}>Düzenle</button>
       </td>
     `;
-		tbody.appendChild(tr);
+		tbodyEl.appendChild(tr);
 	};
 
-	// şu anki sayfanın 1 eksiği örneği 1. sayfaysa 0
 	page --;
-
-	// 10*0 = 0;
 	let start = rows * page;
-	console.log({start});
 	let end = start + rows;
-	// 0 + 10 = 10;
-	console.log({end});
-	// 0. index ve 10.index arası gösterilecek.
-	// hangi seçili sayfadaysak ona göre render ediliyor.
 	let paginatedItems = todos.slice(start, end);
 	paginatedItems.forEach((item) => {
 		renderItem(item);
 	});
-	table.appendChild(tbody);
-	root.append(table);
+
+
+	const generateNextPrevButtons = () => {
+		current_page == 1 ? prevBtn.classList.add('disabled') : prevBtn.classList.remove('disabled');
+		current_page == Math.ceil(todos.length / rows) ? nextBtn.classList.add('disabled') : nextBtn.classList.remove('disabled');
+	}
+
+	generateNextPrevButtons();
 
 	document.querySelectorAll(".remove").forEach((button) => {
 		button.addEventListener("click", (e) => {
@@ -94,38 +76,73 @@ const renderTodos = (page = 1) => {
 		});
 	});
 
-	document.querySelector('#title-sorting').addEventListener('click',() => {
-		// başlığa tıklandığında sıralama yapılacak.
-		todos.sort((a, b) => {
-			// küçük ve büyük harf farkını engellemek için
-			const nameA = a.title.toUpperCase(); // ignore upper and lowercase
-			const nameB = b.title.toUpperCase(); // ignore upper and lowercase
-			if (nameA < nameB) {
-			  return -1;
-			}
-			if (nameA > nameB) {
-			  return 1;
-			}
-		  
-			// names must be equal
-			return 0;
-		  });
-		  // sıralama yapılacak tekrar o sayfada render edilecek.
-		  renderTodos(current_page);
-	});
+
+
 };
 
 
-document.querySelectorAll('.page-link').forEach((btn) => {
-	// pagination butonları içinde döndürülerek, her elemente click eklendi, tıklandığında kaçıncı sayfadaysa oraya göre render edilecek.
-	btn.addEventListener('click',() => {
-		let data_id = btn.getAttribute('data-id');
-		// kaçıncı buton olduğu attribute olarak alında.
-		current_page = Number(data_id);
+
+function SetupPagination () {
+	pagiItems.innerHTML = "";
+	let page_count = Math.ceil(todos.length / rows);
+	for (let i = 1; i < page_count + 1; i++) {
+		let btn = PaginationButton(i);
+		pagiItems.appendChild(btn);
+	}
+};
+
+function PaginationButton (page){
+
+	let button = document.createElement('li');
+	button.classList.add('page-item');
+	button.innerHTML = `<a class="page-link" href="#">${page}</a>`;
+	if (current_page == page) button.classList.add('active');
+
+	button.addEventListener('click', () => {
+		current_page = page;
 		renderTodos(current_page);
+		let current_btn = document.querySelector('.page-item.active');
+		current_btn.classList.remove('active');
+		button.classList.add('active');
+		
 	});
+	return button;
+
+}
+
+
+nextBtn.addEventListener('click', () => {
+	current_page++;
+	renderTodos(current_page);
+	SetupPagination();
 });
 
+prevBtn.addEventListener('click', () => {
+	current_page--;
+	renderTodos(current_page);
+	SetupPagination();
+});
+
+
+document.querySelector('#title-sorting').addEventListener('click',() => {
+	// başlığa tıklandığında sıralama yapılacak.
+	todos.sort((a, b) => {
+		// küçük ve büyük harf farkını engellemek için
+		const nameA = a.title.toUpperCase(); // ignore upper and lowercase
+		const nameB = b.title.toUpperCase(); // ignore upper and lowercase
+		if (nameA < nameB) {
+		  return -1;
+		}
+		if (nameA > nameB) {
+		  return 1;
+		}
+	  
+		// names must be equal
+		return 0;
+	  });
+	  // sıralama yapılacak tekrar o sayfada render edilecek.
+	  renderTodos(current_page);
+});
 
 
 editModal.querySelector("#save").addEventListener("click", () => {
@@ -151,10 +168,13 @@ fetch(todosUrl)
 	.then((data = []) => {
 		todos = data;
 		renderTodos();
+		SetupPagination();
 	})
 	.catch((error) => {
 		errorLogger(error);
 	});
+
+
 
 	// sıralama ödevi algoritması
 	// table thead kısmındaki sıralama yapılacak kolonlara event listener eklenecek.
